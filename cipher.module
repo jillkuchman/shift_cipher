@@ -29,6 +29,7 @@ function cipher_form() {
         '#title' => 'Shift Direction',
         '#type' => 'textfield',
         '#description' => t('Please enter the direction to shift the letters.'),
+        '#element_validate' => array('element_validate_left_or_right'),
         '#required' => TRUE,
     );
     $form['input_phrase'] = array(
@@ -95,4 +96,12 @@ function cipher_form_submit($form, &$form_state) {
 function cipher_success() {
     $output = $_SESSION['output_cipher_string'];
     return $output;
+}
+
+function element_validate_left_or_right($element) {
+    if($element['#value'] != 'left'){
+        if($element['#value'] != 'right') {
+            form_error($element, t('Please enter a shift direction of left or right.'));
+        }
+    }
 }

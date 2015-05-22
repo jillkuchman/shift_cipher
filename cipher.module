@@ -59,21 +59,22 @@ function cipher_form_submit($form, &$form_state) {
         array_push($output_keys, $cipher_key);
     }
 
+    $output_cipher_array = array();
+    foreach ($output_keys as $index) {
+        array_push($output_cipher_array, $alphabet_array[$index]);
+    }
+    $output_cipher_string = implode('', $output_cipher_array);
+
+
     $_SESSION['output_keys'] = $output_keys;
+    $_SESSION['output_cipher_array'] = $output_cipher_array;
+    $_SESSION['output_cipher_string'] = $output_cipher_string;
 
-    $_SESSION['alphabet_array'] = $alphabet_array;
-
-    $_SESSION['key'] = $key;
-    $_SESSION['cipher_key'] = $cipher_key;
-
-    $_SESSION['shift_value'] = $shift_value;
-    $_SESSION['shift_direction'] = $shift_direction;
-    $_SESSION['input_phrase_array'] = $input_phrase_array;
 
     $form_state['redirect'] = 'cipher_success';
 }
 
 function cipher_success() {
-    $output = var_dump($_SESSION['output_keys']);
-    return "hello $output";
+    $output = $_SESSION['output_cipher_string'];
+    return $output;
 }

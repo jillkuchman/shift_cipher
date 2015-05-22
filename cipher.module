@@ -55,40 +55,30 @@ function cipher_form_submit($form, &$form_state) {
     //Converts input phrase to array of characters
     $input_phrase_array = str_split($input_phrase);
 
-    $alphabet_array = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
-    $special_characters = array(' ', '.', ',', '?', '!');
+    $alphabet = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
     //Creates array for output keys
     $output_keys = array();
+    $sample = array();
 
-    //Loops through input array of characters and "converts" to array of alphabet index
+    if($shift_direction == 'left'){
+        $shift_value = 26 - $shift_value;
+    }
+
+    $output_cipher_string = '';
+
     foreach ($input_phrase_array as $character) {
-        $key = array_search($character, $alphabet_array);
-        if ($shift_direction === 'right') {
-            $cipher_key = $key + $shift_value;
+        if(in_array($character, $alphabet)) {
+            $index_of_character = array_search($character, $alphabet);
+            $cipher_key = ($index_of_character + $shift_value) % 26;
+            $output_cipher_string .= $alphabet[$cipher_key];
         }
-        else {
-            $cipher_key = $key - $shift_value;
+        else{
+            $output_cipher_string .= $character;
         }
-        array_push($output_keys, $cipher_key);
     }
 
-    // Creates array for output cipher letters
-    $output_cipher_array = array();
-
-    // "Converts" array of output keys to letters by looping through alphabet array
-    foreach ($output_keys as $index) {
-        array_push($output_cipher_array, $alphabet_array[$index]);
-    }
-
-    // Converts output cipher array to string
-    $output_cipher_string = implode('', $output_cipher_array);
-
-
-    $_SESSION['output_keys'] = $output_keys;
-    $_SESSION['output_cipher_array'] = $output_cipher_array;
     $_SESSION['output_cipher_string'] = $output_cipher_string;
-
 
     $form_state['redirect'] = 'cipher_success';
 }
@@ -98,6 +88,7 @@ function cipher_success() {
     return $output;
 }
 
+//Validates if input is "left" or "right"
 function element_validate_left_or_right($element) {
     if($element['#value'] != 'left'){
         if($element['#value'] != 'right') {

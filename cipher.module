@@ -23,6 +23,7 @@ function cipher_form() {
         '#title' => 'Shift Value',
         '#type' => 'textfield',
         '#description' => t('Please enter the number of places to shift each letter over.'),
+        '#element_validate' => array('element_validate_integer_positive', 'element_validate_alphabet_range'),
         '#required' => TRUE,
     );
     $form['shift_direction'] = array(
@@ -36,6 +37,7 @@ function cipher_form() {
         '#title' => 'Phrase',
         '#type' => 'textfield',
         '#description' => t('Which phrase would you like to encrypt?'),
+        '#element_validate' => array('element_validate_characters'),
         '#required' => TRUE,
     );
 
@@ -43,6 +45,7 @@ function cipher_form() {
         '#type' => 'submit',
         '#value' => 'Go',
     );
+
     return $form;
 }
 
@@ -57,34 +60,34 @@ function cipher_form_submit($form, &$form_state) {
 
     $alphabet = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
-    //Creates array for output keys
-    $output_keys = array();
-    $sample = array();
-
+    //Converts left shift value to equivalent right shift
     if($shift_direction == 'left'){
         $shift_value = 26 - $shift_value;
     }
 
-    $output_cipher_string = '';
+    $output_phrase = '';
 
+    //Loops through each character in input phrase for output cipher phrase
     foreach ($input_phrase_array as $character) {
-        if(in_array($character, $alphabet)) {
-            $index_of_character = array_search($character, $alphabet);
-            $cipher_key = ($index_of_character + $shift_value) % 26;
-            $output_cipher_string .= $alphabet[$cipher_key];
+        $character_lower = strtolower($character);
+        //If character is in the alphabet, an encrypted letter is added to the output phrase. Ignores special characters.
+        if(in_array($character_lower, $alphabet)) {
+            $index_of_character = array_search($character_lower, $alphabet);
+            //Find index of letter in cipher
+            $cipher_index = ($index_of_character + $shift_value) % 26;
+            $output_phrase .= $alphabet[$cipher_index];
         }
         else{
-            $output_cipher_string .= $character;
+            $output_phrase .= $character;
         }
     }
-
-    $_SESSION['output_cipher_string'] = $output_cipher_string;
+    $_SESSION['output_phrase'] = $output_phrase;
 
     $form_state['redirect'] = 'cipher_success';
 }
 
 function cipher_success() {
-    $output = $_SESSION['output_cipher_string'];
+    $output = $_SESSION['output_phrase'];
     return $output;
 }
 
@@ -93,6 +96,23 @@ function element_validate_left_or_right($element) {
     if($element['#value'] != 'left'){
         if($element['#value'] != 'right') {
             form_error($element, t('Please enter a shift direction of left or right.'));
+        }
+    }
+}
+
+function element_validate_alphabet_range($element){
+    if($element['#value'] > 26) {
+        form_error($element, t('Shift value must be between 1 and 25.'));
+    }
+}
+
+function element_validate_characters($element){
+    $allowed_characters = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '.', ',', '!', '?');
+    $element_array = str_split($element['#value']);
+    foreach($element_array as $checked_letter){
+        $checked_letter_lower = strtolower($checked_letter);
+        if(!in_array($checked_letter_lower, $allowed_characters)){
+            form_error($element, t('Input must include only letters, spaces, and the following punctuation: . , ? !'));
         }
     }
 }

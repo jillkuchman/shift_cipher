@@ -49,22 +49,31 @@ function cipher_form_submit($form, &$form_state) {
     $shift_value = $form_state['values']['shift_value'];
     $shift_direction = $form_state['values']['shift_direction'];
     $input_phrase = $form_state['values']['input_phrase'];
+    $input_phrase_array = str_split($input_phrase);
 
     $alphabet_array = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+    $output_keys = array();
+    foreach ($input_phrase_array as $character) {
+        $key = array_search($character, $alphabet_array);
+        $cipher_key = $key + $shift_value;
+        array_push($output_keys, $cipher_key);
+    }
 
-    $key = array_search($input_phrase, $alphabet_array);
+    $_SESSION['output_keys'] = $output_keys;
 
-    $_SESSION['alphabet'] = $alphabet_array;
+    $_SESSION['alphabet_array'] = $alphabet_array;
+
     $_SESSION['key'] = $key;
+    $_SESSION['cipher_key'] = $cipher_key;
 
     $_SESSION['shift_value'] = $shift_value;
     $_SESSION['shift_direction'] = $shift_direction;
-    $_SESSION['input_phrase'] = $input_phrase;
+    $_SESSION['input_phrase_array'] = $input_phrase_array;
 
     $form_state['redirect'] = 'cipher_success';
 }
 
 function cipher_success() {
-    $output = $_SESSION['key'];
+    $output = var_dump($_SESSION['output_keys']);
     return "hello $output";
 }

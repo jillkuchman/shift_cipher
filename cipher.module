@@ -50,6 +50,13 @@ function cipher_form_submit($form, &$form_state) {
     $shift_direction = $form_state['values']['shift_direction'];
     $input_phrase = $form_state['values']['input_phrase'];
 
+    $alphabet_array = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+
+    $key = array_search($input_phrase, $alphabet_array);
+
+    $_SESSION['alphabet'] = $alphabet_array;
+    $_SESSION['key'] = $key;
+
     $_SESSION['shift_value'] = $shift_value;
     $_SESSION['shift_direction'] = $shift_direction;
     $_SESSION['input_phrase'] = $input_phrase;
@@ -58,6 +65,6 @@ function cipher_form_submit($form, &$form_state) {
 }
 
 function cipher_success() {
-    $output = $_SESSION['shift_value'] . $_SESSION['shift_direction'] . $_SESSION['input_phrase'];
-    return $output;
+    $output = $_SESSION['key'];
+    return "hello $output";
 }

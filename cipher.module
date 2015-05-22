@@ -46,23 +46,41 @@ function cipher_form() {
 }
 
 function cipher_form_submit($form, &$form_state) {
+    //Variables for user input from form
     $shift_value = $form_state['values']['shift_value'];
     $shift_direction = $form_state['values']['shift_direction'];
     $input_phrase = $form_state['values']['input_phrase'];
+
+    //Converts input phrase to array of characters
     $input_phrase_array = str_split($input_phrase);
 
     $alphabet_array = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+    $special_characters = array(' ', '.', ',', '?', '!');
+
+    //Creates array for output keys
     $output_keys = array();
+
+    //Loops through input array of characters and "converts" to array of alphabet index
     foreach ($input_phrase_array as $character) {
         $key = array_search($character, $alphabet_array);
-        $cipher_key = $key + $shift_value;
+        if ($shift_direction === 'right') {
+            $cipher_key = $key + $shift_value;
+        }
+        else {
+            $cipher_key = $key - $shift_value;
+        }
         array_push($output_keys, $cipher_key);
     }
 
+    // Creates array for output cipher letters
     $output_cipher_array = array();
+
+    // "Converts" array of output keys to letters by looping through alphabet array
     foreach ($output_keys as $index) {
         array_push($output_cipher_array, $alphabet_array[$index]);
     }
+
+    // Converts output cipher array to string
     $output_cipher_string = implode('', $output_cipher_array);
 
 
